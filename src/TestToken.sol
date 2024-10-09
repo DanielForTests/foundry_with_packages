@@ -18,9 +18,8 @@ contract TestTokenForDeployment is ERC20 {
         uint256 value
     ) internal override {
         if (from != address(0) && to != address(0)) {
-            // Exclude minting and burning
             require(
-                block.timestamp >= _lastTransferTimestamp[from] + 1 weeks,
+                block.timestamp >= _lastTransferTimestamp[from] + 1 days,
                 "Tokens are locked for a week after receiving"
             );
         }

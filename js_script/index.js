@@ -5,7 +5,7 @@ const path = require("path");
 
 (async () => {
   // Replace with your actual contract address
-  const contractAddress = "0x2ba4394f93d457ccac3b36efc6af88fa594a76fa";
+  const contractAddress = "0xc757C972Fa421fE9A738b6A5D29b669aB4936CAd";
   const solFileName = "TestToken.sol";
   const contractName = "TestTokenForDeployment";
 
