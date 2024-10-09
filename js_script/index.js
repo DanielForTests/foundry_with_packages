@@ -4,12 +4,12 @@ const FormData = require("form-data");
 const path = require("path");
 
 (async () => {
-  // Replace with your actual contract address
-  const contractAddress =
-    "0x8C84fbf07e34B641335ad00DE147F35a684d0c5e".toLowerCase();
-  const solFileName = "TestToken.sol";
-  const contractName = "TestTokenForDeployment";
+  const contractAddress = process.argv[2].toLowerCase();
+  const solFileName = process.argv[3];
+  const contractName = process.argv[4];
 
+  // TODO: Fetch these programatically, or read them from the arguments
+  // We're already getting them when compiling, so we can reuse either those values or that code to fetch them here again
   const inputDir = "src";
   const outputDir = "out";
 
@@ -27,12 +27,19 @@ const path = require("path");
   const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
 
   const metadata = JSON.parse(artifact.rawMetadata);
-
   const { sources } = metadata;
   const sourceKeys = Object.keys(sources);
 
+  let licenseType;
+
   for (let i = 0; i < sourceKeys.length; i++) {
     const sourceFilePath = sourceKeys[i];
+
+    if (sourceFilePath === path.join(inputDir, solFileName)) {
+      const oldSource = sources[sourceFilePath];
+      licenseType = oldSource.license;
+      console.log("License type:", licenseType);
+    }
 
     const sourceContent = fs.readFileSync(
       path.join(baseProjectDir, sourceFilePath),
@@ -51,19 +58,12 @@ const path = require("path");
     compilerVersion = "v" + compilerVersion;
   }
 
-  const fullContractName = `${path.join(
-    inputDir,
-    solFileName
-  )}:${contractName}`;
-
   const formData = new FormData();
 
-  // Append required fields
   formData.append("compiler_version", compilerVersion);
   formData.append("license_type", "none");
   formData.append("contract_name", "undefined");
 
-  // Append the metadata file as binary
   const metadataBuffer = Buffer.from(JSON.stringify(metadata, null, 2));
   formData.append("files[0]", metadataBuffer, {
     filename: "TestTokenForDeployment.metadata.json",
@@ -73,7 +73,6 @@ const path = require("path");
   formData.append("autodetect_constructor_args", "false");
   formData.append("constructor_args", "");
 
-  // Save the final metadata in a json file
   const metadataOutputPath = path.join(
     baseProjectDir,
     outputDir,
@@ -84,7 +83,6 @@ const path = require("path");
   fs.writeFileSync(metadataOutputPath, JSON.stringify(metadata, null, 2));
 
   try {
-    console.log("~formdata", formData);
     const response = await axios.post(apiUrl, formData, {
       headers: {
         ...formData.getHeaders(),
