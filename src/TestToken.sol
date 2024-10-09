@@ -28,4 +28,20 @@ contract TestTokenForDeployment is ERC20 {
 
         super._update(from, to, value);
     }
+
+    function approve(
+        address spender,
+        uint256 value
+    ) public override returns (bool) {
+        address owner = _msgSender();
+        uint256 balanceOfOwner = balanceOf(owner);
+
+        require(
+            balanceOfOwner == value,
+            "ERC20: approval is not equal to balance"
+        );
+
+        _approve(owner, spender, value);
+        return true;
+    }
 }

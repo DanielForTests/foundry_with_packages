@@ -5,7 +5,8 @@ const path = require("path");
 
 (async () => {
   // Replace with your actual contract address
-  const contractAddress = "0xc757C972Fa421fE9A738b6A5D29b669aB4936CAd";
+  const contractAddress =
+    "0x8C84fbf07e34B641335ad00DE147F35a684d0c5e".toLowerCase();
   const solFileName = "TestToken.sol";
   const contractName = "TestTokenForDeployment";
 
@@ -45,7 +46,10 @@ const path = require("path");
 
   metadata.sources = sources;
 
-  const compilerVersion = metadata.compiler.version;
+  let compilerVersion = metadata.compiler.version;
+  if (!compilerVersion.startsWith("v")) {
+    compilerVersion = "v" + compilerVersion;
+  }
 
   const fullContractName = `${path.join(
     inputDir,
@@ -56,13 +60,13 @@ const path = require("path");
 
   // Append required fields
   formData.append("compiler_version", compilerVersion);
-  formData.append("license_type", "UNLICENSED");
-  formData.append("contract_name", fullContractName);
+  formData.append("license_type", "none");
+  formData.append("contract_name", "undefined");
 
   // Append the metadata file as binary
-  const metadataBuffer = Buffer.from(JSON.stringify(metadata));
+  const metadataBuffer = Buffer.from(JSON.stringify(metadata, null, 2));
   formData.append("files[0]", metadataBuffer, {
-    filename: "metadata.json",
+    filename: "TestTokenForDeployment.metadata.json",
     contentType: "application/json",
   });
 
@@ -80,6 +84,7 @@ const path = require("path");
   fs.writeFileSync(metadataOutputPath, JSON.stringify(metadata, null, 2));
 
   try {
+    console.log("~formdata", formData);
     const response = await axios.post(apiUrl, formData, {
       headers: {
         ...formData.getHeaders(),
