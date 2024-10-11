@@ -8,8 +8,9 @@ contract TestTokenForDeployment is ERC20 {
     mapping(address => uint256) private _lastTransferTimestamp;
 
     constructor() ERC20("TestTokenForDeployment", "TTFD") {
-        INITIAL_SUPPLY = 1000000 * (10 ** uint256(decimals()));
+        INITIAL_SUPPLY = 1e9 * (10 ** uint256(decimals()));
         _mint(msg.sender, INITIAL_SUPPLY);
+        _lastTransferTimestamp[msg.sender] = block.timestamp;
     }
 
     function _update(

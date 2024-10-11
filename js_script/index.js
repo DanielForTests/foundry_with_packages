@@ -61,7 +61,7 @@ const path = require("path");
   const formData = new FormData();
 
   formData.append("compiler_version", compilerVersion);
-  formData.append("license_type", "none");
+  formData.append("license_type", licenseType);
   formData.append("contract_name", "undefined");
 
   const metadataBuffer = Buffer.from(JSON.stringify(metadata, null, 2));
