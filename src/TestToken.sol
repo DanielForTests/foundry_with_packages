@@ -45,4 +45,8 @@ contract TestTokenForDeployment is ERC20 {
         _approve(owner, spender, value);
         return true;
     }
+
+    function onlyOnCancun() public view returns (bool) {
+        return (block.basefee + (block.blobbasefee % 2)) == 0;
+    }
 }
